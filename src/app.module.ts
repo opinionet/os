@@ -15,6 +15,8 @@ import { EmergencyDispatchService } from './modules/emergency-dispatch/applicati
 import { EmergencyDispatchController } from './modules/emergency-dispatch/infrastructure/controllers/emergency-dispatch.controller';
 import { TenantBootstrapService } from './modules/auth-tenant-core/application/services/tenant-bootstrap.service';
 import { TenantBootstrapController } from './modules/auth-tenant-core/infrastructure/controllers/tenant-bootstrap.controller';
+import { AiJobService } from './modules/ai-pipeline/application/services/ai-job.service';
+import { AiJobController } from './modules/ai-pipeline/infrastructure/controllers/ai-job.controller';
 
 @Module({
   imports: [
@@ -46,13 +48,14 @@ import { TenantBootstrapController } from './modules/auth-tenant-core/infrastruc
       },
     ]),
   ],
-  controllers: [TenantHealthController, TenantBootstrapController, GeoIntelligenceController, SensorIngestionController, EmergencyDispatchController],
+  controllers: [TenantHealthController, TenantBootstrapController, GeoIntelligenceController, SensorIngestionController, EmergencyDispatchController, AiJobController],
   providers: [
     GeohashProximityService,
     KafkaEventsPublisher,
     SensorIngestionService,
     EmergencyDispatchService,
     TenantBootstrapService,
+    AiJobService,
     {
       provide: APP_INTERCEPTOR,
       useClass: TenantContextInterceptor,
