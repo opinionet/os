@@ -2,13 +2,17 @@ import { Module } from '@nestjs/common';
 import { APP_INTERCEPTOR } from '@nestjs/core';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { ClientsModule, Transport } from '@nestjs/microservices';
+import { KafkaEventsPublisher } from './common/kafka/kafka-events.publisher';
 import { TenantContextInterceptor } from './common/interceptors/tenant-context.interceptor';
 import { PrismaModule } from './database/prisma.module';
+import { GeohashProximityService } from './modules/geo-intelligence/application/services/geohash-proximity.service';
+import { GeoIntelligenceController } from './modules/geo-intelligence/infrastructure/controllers/geo-intelligence.controller';
 import { TenantHealthController } from './modules/auth-tenant-core/infrastructure/controllers/tenant-health.controller';
+import { validateEnv } from './config/env.validation';
 
 @Module({
   imports: [
-    ConfigModule.forRoot({ isGlobal: true }),
+    ConfigModule.forRoot({ isGlobal: true, validate: validateEnv }),
     PrismaModule,
     ClientsModule.registerAsync([
       {
@@ -36,8 +40,10 @@ import { TenantHealthController } from './modules/auth-tenant-core/infrastructur
       },
     ]),
   ],
-  controllers: [TenantHealthController],
+  controllers: [TenantHealthController, GeoIntelligenceController],
   providers: [
+    GeohashProximityService,
+    KafkaEventsPublisher,
     {
       provide: APP_INTERCEPTOR,
       useClass: TenantContextInterceptor,
