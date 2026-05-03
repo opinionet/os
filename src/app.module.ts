@@ -25,6 +25,8 @@ import { CityEventsService } from './modules/city-ops/application/services/city-
 import { CityEventsController } from './modules/city-ops/infrastructure/controllers/city-events.controller';
 import { TwinSnapshotsService } from './modules/digital-twin/application/services/twin-snapshots.service';
 import { TwinSnapshotsController } from './modules/digital-twin/infrastructure/controllers/twin-snapshots.controller';
+import { SubscriptionsService } from './modules/billing-subscriptions/application/services/subscriptions.service';
+import { SubscriptionsController } from './modules/billing-subscriptions/infrastructure/controllers/subscriptions.controller';
 
 @Module({
   imports: [
@@ -56,7 +58,7 @@ import { TwinSnapshotsController } from './modules/digital-twin/infrastructure/c
       },
     ]),
   ],
-  controllers: [TenantHealthController, TenantBootstrapController, GeoIntelligenceController, SensorIngestionController, EmergencyDispatchController, AiJobController, NotificationsController, AuditLogsController, CityEventsController, TwinSnapshotsController],
+  controllers: [TenantHealthController, TenantBootstrapController, GeoIntelligenceController, SensorIngestionController, EmergencyDispatchController, AiJobController, NotificationsController, AuditLogsController, CityEventsController, TwinSnapshotsController, SubscriptionsController],
   providers: [
     GeohashProximityService,
     KafkaEventsPublisher,
@@ -68,6 +70,7 @@ import { TwinSnapshotsController } from './modules/digital-twin/infrastructure/c
     AuditLogsService,
     CityEventsService,
     TwinSnapshotsService,
+    SubscriptionsService,
     {
       provide: APP_INTERCEPTOR,
       useClass: TenantContextInterceptor,
