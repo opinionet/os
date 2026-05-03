@@ -21,6 +21,8 @@ import { NotificationsService } from './modules/notifications/application/servic
 import { NotificationsController } from './modules/notifications/infrastructure/controllers/notifications.controller';
 import { AuditLogsService } from './modules/audit-governance/application/services/audit-logs.service';
 import { AuditLogsController } from './modules/audit-governance/infrastructure/controllers/audit-logs.controller';
+import { CityEventsService } from './modules/city-ops/application/services/city-events.service';
+import { CityEventsController } from './modules/city-ops/infrastructure/controllers/city-events.controller';
 
 @Module({
   imports: [
@@ -52,7 +54,7 @@ import { AuditLogsController } from './modules/audit-governance/infrastructure/c
       },
     ]),
   ],
-  controllers: [TenantHealthController, TenantBootstrapController, GeoIntelligenceController, SensorIngestionController, EmergencyDispatchController, AiJobController, NotificationsController, AuditLogsController],
+  controllers: [TenantHealthController, TenantBootstrapController, GeoIntelligenceController, SensorIngestionController, EmergencyDispatchController, AiJobController, NotificationsController, AuditLogsController, CityEventsController],
   providers: [
     GeohashProximityService,
     KafkaEventsPublisher,
@@ -62,6 +64,7 @@ import { AuditLogsController } from './modules/audit-governance/infrastructure/c
     AiJobService,
     NotificationsService,
     AuditLogsService,
+    CityEventsService,
     {
       provide: APP_INTERCEPTOR,
       useClass: TenantContextInterceptor,
