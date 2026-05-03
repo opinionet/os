@@ -13,6 +13,8 @@ import { SensorIngestionService } from './modules/iot-system/application/service
 import { SensorIngestionController } from './modules/iot-system/infrastructure/controllers/sensor-ingestion.controller';
 import { EmergencyDispatchService } from './modules/emergency-dispatch/application/services/emergency-dispatch.service';
 import { EmergencyDispatchController } from './modules/emergency-dispatch/infrastructure/controllers/emergency-dispatch.controller';
+import { TenantBootstrapService } from './modules/auth-tenant-core/application/services/tenant-bootstrap.service';
+import { TenantBootstrapController } from './modules/auth-tenant-core/infrastructure/controllers/tenant-bootstrap.controller';
 
 @Module({
   imports: [
@@ -44,12 +46,13 @@ import { EmergencyDispatchController } from './modules/emergency-dispatch/infras
       },
     ]),
   ],
-  controllers: [TenantHealthController, GeoIntelligenceController, SensorIngestionController, EmergencyDispatchController],
+  controllers: [TenantHealthController, TenantBootstrapController, GeoIntelligenceController, SensorIngestionController, EmergencyDispatchController],
   providers: [
     GeohashProximityService,
     KafkaEventsPublisher,
     SensorIngestionService,
     EmergencyDispatchService,
+    TenantBootstrapService,
     {
       provide: APP_INTERCEPTOR,
       useClass: TenantContextInterceptor,
