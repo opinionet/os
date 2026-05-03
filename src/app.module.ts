@@ -19,6 +19,8 @@ import { AiJobService } from './modules/ai-pipeline/application/services/ai-job.
 import { AiJobController } from './modules/ai-pipeline/infrastructure/controllers/ai-job.controller';
 import { NotificationsService } from './modules/notifications/application/services/notifications.service';
 import { NotificationsController } from './modules/notifications/infrastructure/controllers/notifications.controller';
+import { AuditLogsService } from './modules/audit-governance/application/services/audit-logs.service';
+import { AuditLogsController } from './modules/audit-governance/infrastructure/controllers/audit-logs.controller';
 
 @Module({
   imports: [
@@ -50,7 +52,7 @@ import { NotificationsController } from './modules/notifications/infrastructure/
       },
     ]),
   ],
-  controllers: [TenantHealthController, TenantBootstrapController, GeoIntelligenceController, SensorIngestionController, EmergencyDispatchController, AiJobController, NotificationsController],
+  controllers: [TenantHealthController, TenantBootstrapController, GeoIntelligenceController, SensorIngestionController, EmergencyDispatchController, AiJobController, NotificationsController, AuditLogsController],
   providers: [
     GeohashProximityService,
     KafkaEventsPublisher,
@@ -59,6 +61,7 @@ import { NotificationsController } from './modules/notifications/infrastructure/
     TenantBootstrapService,
     AiJobService,
     NotificationsService,
+    AuditLogsService,
     {
       provide: APP_INTERCEPTOR,
       useClass: TenantContextInterceptor,
