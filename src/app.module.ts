@@ -9,6 +9,8 @@ import { GeohashProximityService } from './modules/geo-intelligence/application/
 import { GeoIntelligenceController } from './modules/geo-intelligence/infrastructure/controllers/geo-intelligence.controller';
 import { TenantHealthController } from './modules/auth-tenant-core/infrastructure/controllers/tenant-health.controller';
 import { validateEnv } from './config/env.validation';
+import { SensorIngestionService } from './modules/iot-system/application/services/sensor-ingestion.service';
+import { SensorIngestionController } from './modules/iot-system/infrastructure/controllers/sensor-ingestion.controller';
 
 @Module({
   imports: [
@@ -40,10 +42,11 @@ import { validateEnv } from './config/env.validation';
       },
     ]),
   ],
-  controllers: [TenantHealthController, GeoIntelligenceController],
+  controllers: [TenantHealthController, GeoIntelligenceController, SensorIngestionController],
   providers: [
     GeohashProximityService,
     KafkaEventsPublisher,
+    SensorIngestionService,
     {
       provide: APP_INTERCEPTOR,
       useClass: TenantContextInterceptor,
