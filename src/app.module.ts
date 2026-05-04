@@ -25,6 +25,8 @@ import { CityEventsService } from './modules/city-ops/application/services/city-
 import { CityEventsController } from './modules/city-ops/infrastructure/controllers/city-events.controller';
 import { TasksService } from './modules/city-ops/application/services/tasks.service';
 import { TasksController } from './modules/city-ops/infrastructure/controllers/tasks.controller';
+import { CityReportsService } from './modules/city-ops/application/services/city-reports.service';
+import { CityReportsController } from './modules/city-ops/infrastructure/controllers/city-reports.controller';
 import { TwinSnapshotsService } from './modules/digital-twin/application/services/twin-snapshots.service';
 import { TwinSnapshotsController } from './modules/digital-twin/infrastructure/controllers/twin-snapshots.controller';
 import { SimulationRunsService } from './modules/digital-twin/application/services/simulation-runs.service';
@@ -63,7 +65,7 @@ import { CityEventsGateway } from './common/websocket/city-events.gateway';
       },
     ]),
   ],
-  controllers: [TenantHealthController, TenantBootstrapController, GeoIntelligenceController, SensorIngestionController, EmergencyDispatchController, AiJobController, NotificationsController, AuditLogsController, CityEventsController, TasksController, TwinSnapshotsController, SimulationRunsController, SubscriptionsController],
+  controllers: [TenantHealthController, TenantBootstrapController, GeoIntelligenceController, SensorIngestionController, EmergencyDispatchController, AiJobController, NotificationsController, AuditLogsController, CityEventsController, TasksController, CityReportsController, TwinSnapshotsController, SimulationRunsController, SubscriptionsController],
   providers: [
     GeohashProximityService,
     KafkaEventsPublisher,
@@ -75,6 +77,7 @@ import { CityEventsGateway } from './common/websocket/city-events.gateway';
     AuditLogsService,
     CityEventsService,
     TasksService,
+    CityReportsService,
     TwinSnapshotsService,
     SimulationRunsService,
     SubscriptionsService,
