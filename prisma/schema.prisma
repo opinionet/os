@@ -1,0 +1,136 @@
+generator client {
+  provider        = "prisma-client-js"
+  previewFeatures = ["fullTextSearch"]
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum Role {
+  SUPER_ADMIN
+  ORG_ADMIN
+  DISPATCHER
+  WORKER
+  CITIZEN
+  SYSTEM
+}
+
+enum SubscriptionTier {
+  TRIAL
+  STANDARD
+  PROFESSIONAL
+  ENTERPRISE
+}
+
+enum PaymentStatus {
+  PENDING
+  SUCCESS
+  FAILED
+  REFUNDED
+}
+
+enum DeviceType {
+  CAMERA
+  AIR_QUALITY
+  TRAFFIC_LIGHT
+  WEATHER_STATION
+  WATER_LEVEL
+  SMART_METER
+  DRONE
+}
+
+enum DeviceStatus {
+  ONLINE
+  OFFLINE
+  MAINTENANCE
+  ERROR
+  DECOMMISSIONED
+}
+
+enum ReportStatus {
+  OPEN
+  IN_REVIEW
+  ASSIGNED
+  RESOLVED
+  DISMISSED
+}
+
+enum TaskStatus {
+  PENDING
+  DISPATCHED
+  IN_PROGRESS
+  BLOCKED
+  COMPLETED
+  CANCELLED
+}
+
+enum EmergencySeverity {
+  LOW
+  MEDIUM
+  HIGH
+  CRITICAL
+}
+
+enum EmergencyStatus {
+  DETECTED
+  RESPONDING
+  CONTAINED
+  RESOLVED
+  FALSE_ALARM
+}
+
+enum AiJobStatus {
+  QUEUED
+  PROCESSING
+  COMPLETED
+  FAILED
+}
+
+enum EventType {
+  SYSTEM
+  USER_ACTION
+  IOT_TELEMETRY
+  AI_PREDICTION
+  EMERGENCY_ALERT
+}
+
+model Organization {
+  id            String               @id @default(uuid())
+  name          String
+  domain        String               @unique
+  region        String
+  createdAt     DateTime             @default(now())
+  updatedAt     DateTime             @updatedAt
+  users         User[]
+  subscriptions Subscription[]
+  payments      PaymentTransaction[]
+  devices       IotDevice[]
+  geoNodes      GeoNode[]
+  reports       CityReport[]
+  tasks         Task[]
+  emergencies   Emergency[]
+  events        CityEvent[]
+  notifications Notification[]
+  auditLogs     AuditLog[]
+  aiJobs        AiJob[]
+  twinSnapshots TwinSnapshot[]
+}
+
+model Subscription { id String @id @default(uuid()) organizationId String organization Organization @relation(fields:[organizationId],references:[id],onDelete:Cascade) tier SubscriptionTier isActive Boolean @default(true) startDate DateTime @default(now()) endDate DateTime? stripeSubId String? @unique @@index([organizationId,isActive]) }
+model PaymentTransaction { id String @id @default(uuid()) organizationId String organization Organization @relation(fields:[organizationId],references:[id],onDelete:Cascade) amount Decimal @db.Decimal(10,2) currency String @default("USD") status PaymentStatus @default(PENDING) stripeChargeId String? @unique createdAt DateTime @default(now()) @@index([organizationId,createdAt]) }
+model User { id String @id @default(uuid()) organizationId String organization Organization @relation(fields:[organizationId],references:[id],onDelete:Cascade) email String @unique passwordHash String role Role firstName String lastName String phone String? isActive Boolean @default(true) createdAt DateTime @default(now()) updatedAt DateTime @updatedAt assignedTasks Task[] @relation("TaskAssignee") createdReports CityReport[] @relation("ReportCreator") auditLogs AuditLog[] @relation("UserAuditLogs") notifications Notification[] @@index([organizationId,role]) }
+model GeoNode { id String @id @default(uuid()) organizationId String organization Organization @relation(fields:[organizationId],references:[id],onDelete:Cascade) latitude Float longitude Float geoHash String @db.VarChar(12) metadata Json? devices IotDevice[] reports CityReport[] tasks Task[] emergencies Emergency[] @@index([organizationId,geoHash]) }
+model IotDevice { id String @id @default(uuid()) organizationId String organization Organization @relation(fields:[organizationId],references:[id],onDelete:Cascade) name String type DeviceType status DeviceStatus @default(OFFLINE) macAddress String? @unique firmwareVer String? geoNodeId String? geoNode GeoNode? @relation(fields:[geoNodeId],references:[id],onDelete:SetNull) installedAt DateTime @default(now()) lastPingAt DateTime? sensorData SensorData[] emergencies Emergency[] @relation("DeviceDetected") @@index([organizationId,type,status]) }
+model SensorData { id String @id @default(uuid()) deviceId String device IotDevice @relation(fields:[deviceId],references:[id],onDelete:Cascade) payload Json timestamp DateTime @default(now()) @@index([deviceId,timestamp(sort:Desc)]) }
+model CityReport { id String @id @default(uuid()) organizationId String organization Organization @relation(fields:[organizationId],references:[id],onDelete:Cascade) reporterId String? reporter User? @relation("ReportCreator",fields:[reporterId],references:[id],onDelete:SetNull) title String description String status ReportStatus @default(OPEN) mediaUrls String[] geoNodeId String? geoNode GeoNode? @relation(fields:[geoNodeId],references:[id],onDelete:SetNull) tasks Task[] createdAt DateTime @default(now()) updatedAt DateTime @updatedAt @@index([organizationId,status]) }
+model Emergency { id String @id @default(uuid()) organizationId String organization Organization @relation(fields:[organizationId],references:[id],onDelete:Cascade) title String severity EmergencySeverity status EmergencyStatus @default(DETECTED) detectedById String? detectedBy IotDevice? @relation("DeviceDetected",fields:[detectedById],references:[id],onDelete:SetNull) geoNodeId String geoNode GeoNode @relation(fields:[geoNodeId],references:[id],onDelete:Restrict) tasks Task[] @relation("EmergencyTasks") aiAnalyses AiAnalysis[] @relation("EmergencyAnalysis") createdAt DateTime @default(now()) resolvedAt DateTime? @@index([organizationId,severity,status]) }
+model Task { id String @id @default(uuid()) organizationId String organization Organization @relation(fields:[organizationId],references:[id],onDelete:Cascade) title String description String? status TaskStatus @default(PENDING) assigneeId String? assignee User? @relation("TaskAssignee",fields:[assigneeId],references:[id],onDelete:SetNull) reportId String? report CityReport? @relation(fields:[reportId],references:[id],onDelete:SetNull) emergencyId String? emergency Emergency? @relation("EmergencyTasks",fields:[emergencyId],references:[id],onDelete:Cascade) geoNodeId String? geoNode GeoNode? @relation(fields:[geoNodeId],references:[id],onDelete:SetNull) createdAt DateTime @default(now()) updatedAt DateTime @updatedAt completedAt DateTime? @@index([organizationId,assigneeId,status]) @@index([organizationId,emergencyId]) }
+model AiJob { id String @id @default(uuid()) organizationId String organization Organization @relation(fields:[organizationId],references:[id],onDelete:Cascade) modelName String status AiJobStatus @default(QUEUED) inputPayload Json targetType String targetId String analyses AiAnalysis[] createdAt DateTime @default(now()) completedAt DateTime? @@index([organizationId,status]) }
+model AiAnalysis { id String @id @default(uuid()) jobId String job AiJob @relation(fields:[jobId],references:[id],onDelete:Cascade) confidence Float resultPayload Json isActionable Boolean @default(false) actionTaken Boolean @default(false) emergencyId String? emergency Emergency? @relation("EmergencyAnalysis",fields:[emergencyId],references:[id],onDelete:Cascade) createdAt DateTime @default(now()) }
+model TwinSnapshot { id String @id @default(uuid()) organizationId String organization Organization @relation(fields:[organizationId],references:[id],onDelete:Cascade) version String stateData Json generatedAt DateTime @default(now()) simulations SimulationRun[] @@index([organizationId,generatedAt]) }
+model SimulationRun { id String @id @default(uuid()) snapshotId String snapshot TwinSnapshot @relation(fields:[snapshotId],references:[id],onDelete:Cascade) scenarioName String parameters Json results Json executedAt DateTime @default(now()) }
+model CityEvent { id String @id @default(uuid()) organizationId String organization Organization @relation(fields:[organizationId],references:[id],onDelete:Cascade) type EventType sourceName String payload Json timestamp DateTime @default(now()) @@index([organizationId,timestamp(sort:Desc)]) }
+model Notification { id String @id @default(uuid()) organizationId String organization Organization @relation(fields:[organizationId],references:[id],onDelete:Cascade) userId String user User @relation(fields:[userId],references:[id],onDelete:Cascade) title String message String isRead Boolean @default(false) actionUrl String? createdAt DateTime @default(now()) @@index([userId,isRead]) }
+model AuditLog { id String @id @default(uuid()) organizationId String organization Organization @relation(fields:[organizationId],references:[id],onDelete:Cascade) userId String? user User? @relation("UserAuditLogs",fields:[userId],references:[id],onDelete:SetNull) action String entityType String entityId String previousState Json? newState Json? ipAddress String? userAgent String? timestamp DateTime @default(now()) @@index([organizationId,entityType,entityId]) @@index([organizationId,timestamp(sort:Desc)]) }
