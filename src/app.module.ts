@@ -33,6 +33,8 @@ import { SimulationRunsService } from './modules/digital-twin/application/servic
 import { SimulationRunsController } from './modules/digital-twin/infrastructure/controllers/simulation-runs.controller';
 import { SubscriptionsService } from './modules/billing-subscriptions/application/services/subscriptions.service';
 import { SubscriptionsController } from './modules/billing-subscriptions/infrastructure/controllers/subscriptions.controller';
+import { PaymentTransactionsService } from './modules/billing-subscriptions/application/services/payment-transactions.service';
+import { PaymentTransactionsController } from './modules/billing-subscriptions/infrastructure/controllers/payment-transactions.controller';
 import { CityEventsGateway } from './common/websocket/city-events.gateway';
 
 @Module({
@@ -65,7 +67,7 @@ import { CityEventsGateway } from './common/websocket/city-events.gateway';
       },
     ]),
   ],
-  controllers: [TenantHealthController, TenantBootstrapController, GeoIntelligenceController, SensorIngestionController, EmergencyDispatchController, AiJobController, NotificationsController, AuditLogsController, CityEventsController, TasksController, CityReportsController, TwinSnapshotsController, SimulationRunsController, SubscriptionsController],
+  controllers: [TenantHealthController, TenantBootstrapController, GeoIntelligenceController, SensorIngestionController, EmergencyDispatchController, AiJobController, NotificationsController, AuditLogsController, CityEventsController, TasksController, CityReportsController, TwinSnapshotsController, SimulationRunsController, SubscriptionsController, PaymentTransactionsController],
   providers: [
     GeohashProximityService,
     KafkaEventsPublisher,
@@ -81,6 +83,7 @@ import { CityEventsGateway } from './common/websocket/city-events.gateway';
     TwinSnapshotsService,
     SimulationRunsService,
     SubscriptionsService,
+    PaymentTransactionsService,
     CityEventsGateway,
     {
       provide: APP_INTERCEPTOR,
